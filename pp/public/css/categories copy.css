@@ -1,0 +1,149 @@
+/* categories.css (only for categories.html) */
+/* Category Navigation Bar */
+.category-navbar {
+  background: #333;
+  color: white;
+  padding: 15px 20px;
+  position: sticky; /* Make it stick below the header */
+  top: 100px; /* Adjust this value if your header's height is different */
+  left: 0;
+  width: 100%;
+  z-index: 999; /* Ensure it's above other content */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+.category-navbar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.category-navbar ul li a {
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
+
+.category-navbar ul li a:hover {
+  color: #fdd835;
+}
+
+/* Product Grid Section */
+.product-grid {
+  padding: 20px;
+  text-align: center;
+  margin-top: 20px; /* Add some space below the category navigation */
+}
+
+.category-title {
+  font-size: 28px;
+  margin-top: 80px;
+  margin-bottom: 20px;
+  color: white; /* Ensure title is visible */
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjust min width as needed */
+  gap: 20px;
+  padding: 20px;
+}
+
+
+.product-item {
+  background: #222;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: left;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+}
+
+.product-item .image-placeholder {
+  background: #444; /* Placeholder color for image */
+  /* Remove the height property */
+  margin-bottom: 10px;
+  border-radius: 5px;
+  overflow: hidden; /* Clip images that might exceed the container */
+}
+
+.product-item .image-placeholder img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.product-info h3 {
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 5px;
+  color: white;
+}
+
+.product-info .price {
+  color: #fdd835; /* Highlight the price */
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.product-info .wishlist {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.product-info .wishlist i {
+  margin-right: 5px;
+}
+
+.product-info .wishlist:hover {
+  color: white;
+}
+
+.product-item .options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.product-item .options label {
+  color: #ccc;
+  font-size: 14px;
+}
+
+.product-item .options select {
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.product-item .add-to-cart {
+  background: #fdd835;
+  color: black;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.product-item .add-to-cart:hover {
+  background-color: #e0c030;
+}

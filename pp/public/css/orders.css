@@ -1,0 +1,188 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9fafb;
+    margin: 0;
+    padding: 30px;
+    color: #222;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #111;
+}
+
+.table-wrapper {
+    background-color: #fff;
+    padding: 20px 25px;
+    border: 1px solid #d7dde6; /* subtle border instead of shadow */
+    border-radius: 4px; /* slight rounding */
+    overflow-x: auto;
+}
+
+/* Table itself */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+}
+
+/* Table head with soft pastel background */
+thead {
+    background-color: #dbe5ff; /* lighter pastel blue */
+    color: #2c3e50;
+}
+
+thead th {
+    padding: 14px 18px;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 2px solid #a3b8ff;
+}
+
+/* Table body rows */
+tbody tr {
+    border-bottom: 1px solid #e6ebf1;
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: #f3f8ff; /* subtle pastel blue highlight */
+}
+
+/* Table body cells */
+tbody td {
+    padding: 12px 18px;
+    color: #4a5568;
+    vertical-align: middle;
+}
+
+/* First column emphasis */
+tbody td:first-child {
+    font-weight: 600;
+    color: #2c3e50;
+    white-space: nowrap;
+}
+
+/* Status badges */
+td.status {
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status.pending {
+    background-color: #fff9db;  /* pastel yellow */
+    color: #b78900;
+    padding: 5px 12px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.status.approved {
+    background-color: #d3f9d8; /* pastel green */
+    color: #2a7a2a;
+    padding: 5px 12px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+.status.rejected {
+    background-color: #ffd9d9; /* pastel red */
+    color: #b82b2b;
+    padding: 5px 12px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+/* Action buttons */
+.actions {
+    white-space: nowrap;
+}
+
+.action-btn {
+    background: none;
+    border: 1px solid transparent;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 8px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* Approve button - pastel green */
+.action-btn.approve {
+    color: #2a7a2a;
+    border-color: #7dd87d;
+    background-color: #e6f6e9;
+}
+.action-btn.approve:hover {
+    background-color: #7dd87d;
+    color: #fff;
+    border-color: #4caf50;
+}
+
+/* Reject button - pastel red */
+.action-btn.reject {
+    color: #b82b2b;
+    border-color: #ffa8a8;
+    background-color: #ffe6e6;
+}
+.action-btn.reject:hover {
+    background-color: #ff6b6b;
+    color: #fff;
+    border-color: #e53935;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tr {
+        margin-bottom: 16px;
+        background-color: #fff;
+        border: 1px solid #d7dde6;
+        border-radius: 6px;
+        padding: 18px 15px;
+    }
+
+    td {
+        padding: 10px 15px 10px 50%;
+        position: relative;
+        border: none;
+        text-align: left;
+        font-size: 0.95rem;
+        color: #444b5a;
+    }
+
+    td::before {
+        position: absolute;
+        top: 10px;
+        left: 18px;
+        width: 40%;
+        white-space: nowrap;
+        font-weight: 600;
+        color: #555;
+        content: attr(data-label);
+    }
+
+    .actions {
+        white-space: normal;
+        margin-top: 12px;
+    }
+}

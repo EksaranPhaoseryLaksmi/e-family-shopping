@@ -1,0 +1,118 @@
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9fafb;
+    color: #333;
+    margin: 20px;
+}
+
+/* ===== Orders Table ===== */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(100, 100, 120, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+thead {
+    background-color: #a3b8ff;
+    color: #ecf0f1; /* light gray */
+}
+
+thead th {
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-bottom: 2px solid #34495e;
+}
+
+tbody tr {
+    border-bottom: 1px solid #e1e8f0;
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: #dce6f1;
+}
+
+tbody td {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    color: #34495e;
+}
+
+/* ===== Status Badges ===== */
+
+td.status {
+    font-weight: 600;
+    text-transform: capitalize;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    font-size: 0.85rem;
+}
+
+.status.pending {
+    background-color: #fef3c7; /* pastel yellow */
+    color: #b45309;
+    box-shadow: 0 0 6px #fef3c7aa;
+}
+
+.status.approved {
+    background-color: #d1fae5; /* pastel green */
+    color: #065f46;
+    box-shadow: 0 0 6px #d1fae5aa;
+}
+
+.status.rejected {
+    background-color: #fecaca; /* pastel red */
+    color: #991b1b;
+    box-shadow: 0 0 6px #fecacaaa;
+}
+
+/* ===== Action Buttons ===== */
+
+.action-btn {
+    border: none;
+    padding: 6px 14px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-right: 8px;
+    transition: background-color 0.3s ease;
+    color: #fff;
+}
+
+.action-btn.approve {
+    background-color: #22c55e; /* green */
+}
+
+.action-btn.approve:hover {
+    background-color: #16a34a;
+}
+
+.action-btn.reject {
+    background-color: #ef4444; /* red */
+}
+
+.action-btn.reject:hover {
+    background-color: #b91c1c;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 650px) {
+    table,
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+}
