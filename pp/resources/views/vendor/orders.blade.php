@@ -92,7 +92,13 @@
                     <p><strong>Receipt No:</strong> {{ $receiptNo }}</p>
                     <p><strong>Name:</strong> {{ $first->delivery_name }}</p>
                     <p><strong>Address:</strong> {{ $first->delivery_address }}</p>
-                    <!--<p><strong>Email:</strong> {{ $first->delivery_email }}</p>-->
+                    <p><strong>Phone&Map:</strong> {{ $first->delivery_phone }},@if($first->delivery_map)
+                    <a href="{{ $first->delivery_map }}" target="_blank">
+                        📍 View Map
+                    </a>
+                @else
+                    <span>No map provided</span>
+                @endif</p>
                     <p><strong>Ordered At:</strong> {{ $first->created_at->format('d M Y H:i') }}</p>
                     @if ($first->receipt_image)
                     <p>

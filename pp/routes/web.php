@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\URL;
+use App\Http\Controllers\PaymentController;
 
 
 //Customer Routes
@@ -38,6 +39,18 @@ Route::middleware(['auth', 'role:user'])->group(function () {
     })->name('contact.page');
     Route::get('/my-orders', [OrderController::class, 'myOrders'])->name('orders.history');
     Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+    Route::get('/payment', [PaymentController::class, 'index']);
+    // ✅ Generate QR
+    //Route::post('/generate-khqr', [PaymentController::class, 'generateQr']);
+    // ✅ Check payment
+    Route::get('/check-payment', [PaymentController::class, 'checkQr']);
+    // ✅ Your existing order
+    Route::post('/submit-order', [PaymentController::class, 'submitOrder']);
+   Route::get('/payment-qr', [PaymentController::class, 'showPage']);
+   //Route::post('/khqr/generate', [PaymentController::class, 'generateQr']);
+   Route::post('/khqr/generate', [PaymentController::class, 'generateKHQR']);
+   Route::get('/khqr/check', [PaymentController::class, 'checkPayment']);
+
 });
 
 Route::middleware(['auth', 'role:vendor'])->group(function () {
@@ -83,6 +96,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/orders/{order}/approve', [OrderController::class, 'approve'])->name('admin.orders.approve');
     Route::post('/admin/orders/{order}/reject', [OrderController::class, 'reject'])->name('admin.orders.reject');
     Route::post('/admin/users/{user}/toggle', [AdminController::class, 'toggleActive'])->name('admin.users.toggle');
+    Route::get('/payments', [AdminController::class, 'index'])->name('admin.payments');
+    Route::post('/payments/{id}/check', [AdminController::class, 'check']);
+    Route::get('/payments/{ref}', [AdminController::class, 'view'])
+            ->name('admin.payments.view');
 });
 
 // Auth routes

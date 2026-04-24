@@ -6,7 +6,13 @@ body {
     font-family: Arial, sans-serif;
     font-size: 1.125rem; /* Base font size, ~18px */
 }
-
+.bakong-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin-right: 1px;
+    vertical-align: middle;
+}
 /* Main layout for payment and summary side-by-side */
 .payment-main-container {
     display: flex;
@@ -771,5 +777,9 @@ body {
     object-fit: contain;
 }
 
+#khqr-status,
+#countdown {
+    color: #111 !important;
+}
 
 }

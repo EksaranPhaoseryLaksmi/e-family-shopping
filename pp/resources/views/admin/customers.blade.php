@@ -18,6 +18,9 @@
     <nav>
       <a href="{{ route('admin.dashboard') }}" ><i class="fas fa-chart-line"></i> Dashboard</a>
       <a href="{{ route('admin.products') }}"><i class="fas fa-box"></i> Products</a>
+      <a href="{{ route('admin.payments') }}">
+                <i class="fas fa-box"></i> Payments
+            </a>
       <a href="{{ route('admin.orders') }}"><i class="fas fa-shopping-cart"></i> Orders</a>
       <a href="{{ route('admin.customers') }}" class="active"><i class="fas fa-user"></i> Users</a>
     </nav>

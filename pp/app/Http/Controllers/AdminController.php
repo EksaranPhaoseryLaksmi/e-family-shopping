@@ -10,6 +10,7 @@ use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
+use App\Models\PaymentSession;
 
 class AdminController extends Controller
 {
@@ -221,4 +222,70 @@ class AdminController extends Controller
         return back()->with('success', 'Password reset link sent.');
     }
 
+    public function index(Request $request)
+    {
+        $status = $request->status;
+
+        $payments = PaymentSession::with(['user'])
+            ->when($status, fn($q) => $q->where('status', $status))
+            ->latest()
+            ->paginate(20);
+
+        return view('admin.payments.index', compact('payments'));
+    }
+
+    public function check($id)
+    {
+        $session = PaymentSession::findOrFail($id);
+
+        $response = Http::post('http://127.0.0.1:3000/check-payment', [
+            'md5' => $session->bakong_md5
+        ]);
+
+        $result = $response->json();
+
+        if (data_get($result, 'data.responseCode') === 0) {
+
+            // already paid
+            $this->markAsPaid($session);
+
+            return back()->with('success', 'Payment verified!');
+        }
+
+        return back()->with('error', 'Still pending');
+    }
+
+    private function markAsPaid($session)
+    {
+        if ($session->status === 'paid') return;
+
+        $cart = json_decode($session->cart, true);
+
+        foreach ($cart as $item) {
+            \App\Models\Order::create([
+                'vendor_id' => $item['vendor_id'] ?? $session->vendor_id,
+                'user_id' => $session->user_id,
+                'product_id' => $item['id'],
+                'product_name' => $item['name'],
+                'size' => $item['size'] ?? null,
+                'quantity' => $item['quantity'],
+                'total_price' => $item['price'] * $item['quantity'],
+
+                'delivery_name' => $session->delivery_name,
+                'delivery_address' => $session->delivery_address,
+                'delivery_email' => $session->delivery_email,
+
+                'status' => 'paid',
+                'receipt_no' => $session->payment_ref,
+            ]);
+        }
+
+        $session->update(['status' => 'paid']);
+    }
+    public function view($ref)
+    {
+        $payment = \App\Models\PaymentSession::where('payment_ref', $ref)->firstOrFail();
+
+        return view('admin.payments.view', compact('payment'));
+    }
 }

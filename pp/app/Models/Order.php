@@ -15,6 +15,8 @@ class Order extends Model
     'delivery_name',
     'delivery_address',
     'delivery_email',
+    'delivery_phone',
+    'delivery_map',
     'product_name',
     'quantity',
     'total_price',

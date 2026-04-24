@@ -146,7 +146,13 @@
             <div class="text-sm text-gray-700 mb-3">
                 <p>
                     <strong>Delivery:</strong> {{ $first->delivery_name }},
-                    {{ $first->delivery_address }}
+                    {{ $first->delivery_address }},{{ $first->delivery_phone }},@if($first->delivery_map)
+                                                                                    <a href="{{ $first->delivery_map }}" target="_blank">
+                                                                                        📍 View Map
+                                                                                    </a>
+                                                                                @else
+                                                                                    <span>No map provided</span>
+                                                                                @endif
                 </p>
                 <p><strong>Order Date:</strong> {{ $first->created_at->format('Y-m-d') }}</p>
             </div>

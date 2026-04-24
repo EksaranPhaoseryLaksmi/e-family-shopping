@@ -154,7 +154,7 @@ public function myOrders(Request $request)
 
     public function updateProduct($id,$size,$qty)
     {
-        
+
         $product = Product::where('id', $id)->first();
         if ($product) {
             $updatedVariants = [];
@@ -169,7 +169,7 @@ public function myOrders(Request $request)
                 'variants' => $updatedVariants, // your logic
                 ]);
         }
-    }  
+    }
     public function approve(Order $order)
     {
         $order->update(['status' => 'approved']);
@@ -181,5 +181,34 @@ public function myOrders(Request $request)
         $order->update(['status' => 'rejected']);
         return redirect()->back()->with('success', 'Order rejected successfully.');
     }
-             
+
+    public function submitOrder(Request $request)
+    {
+        $cart = json_decode($request->cart, true);
+
+        foreach ($cart as $item) {
+            \App\Models\Order::create([
+                'vendor_id' => 1,
+                'user_id' => auth()->id(),
+
+                'product_id' => $item['id'] ?? null,
+                'product_name' => $item['name'],
+                'size' => $item['size'] ?? null,
+                'quantity' => $item['quantity'],
+                'total_price' => $item['price'] * $item['quantity'],
+
+                // ✅ REAL DATA FROM FRONTEND
+                'delivery_name' => $request->delivery_name,
+                'delivery_address' => $request->delivery_address,
+                'delivery_email' => $request->delivery_email,
+
+                'status' => 'paid',
+
+                // 🔥 IMPORTANT LINK
+                'receipt_no' => $request->payment_ref,
+            ]);
+        }
+
+        return response()->json(['success' => true]);
+    }
 }

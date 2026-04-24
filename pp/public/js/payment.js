@@ -382,7 +382,113 @@ document.addEventListener("DOMContentLoaded", () => {
         renderCartSummaryItems();
     }
 
-  function handleSuccessfulTransaction() {
+    function handleSuccessfulTransaction(orderId = null) {
+
+        const receiptUploadABA = document.getElementById("receipt-upload-ABA");
+        const receiptUploadACLEDA = document.getElementById("receipt-upload-ACLEDA");
+
+        const firstName = document.getElementById('delivery-first-name')?.value.trim() || '';
+        const lastName = document.getElementById('delivery-last-name')?.value.trim() || '';
+        const fullName = `${firstName} ${lastName}`.trim();
+
+        const address = document.getElementById('delivery-address')?.value.trim() || '';
+        const apartment = document.getElementById('delivery-apartment')?.value.trim() || '';
+        const city = document.getElementById('delivery-city')?.value.trim() || '';
+        const fullAddress = `${address}${apartment ? ', ' + apartment : ''}, ${city}`;
+
+        const email = document.getElementById('contact-email')?.value.trim() || 'no@email.com';
+        const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+
+        if (cart.length === 0) {
+            alert("Your cart is empty.");
+            return;
+        }
+
+        // =========================
+        // PAYMENT MODE DETECTION
+        // =========================
+        const isKhqrFlow = !!orderId;
+
+        let receiptFile = null;
+
+        if (!isKhqrFlow) {
+            // only required for manual upload flow
+            const abaReceipt = receiptUploadABA?.files?.[0] || null;
+            const acledaReceipt = receiptUploadACLEDA?.files?.[0] || null;
+            receiptFile = abaReceipt || acledaReceipt;
+
+            if (!receiptFile) {
+                alert("Please upload your receipt image.");
+                return;
+            }
+        }
+
+        // =========================
+        // FORM DATA
+        // =========================
+        const formData = new FormData();
+
+        formData.append("delivery_name", fullName);
+        formData.append("delivery_address", fullAddress);
+        formData.append("delivery_email", email);
+        formData.append("cart", JSON.stringify(cart));
+
+        // KHQR mode
+        if (isKhqrFlow) {
+            formData.append("payment_ref", orderId);
+            formData.append("payment_method", "khqr");
+        } else {
+            formData.append("receipt_image", receiptFile);
+            formData.append("payment_method", "manual");
+        }
+
+        // =========================
+        // SUBMIT
+        // =========================
+        fetch("/submit-order", {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": document.querySelector("meta[name='csrf-token']").content,
+            },
+            body: formData,
+        })
+        .then(async (res) => {
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw errorData;
+            }
+            return res.json();
+        })
+        .then((data) => {
+
+            localStorage.removeItem("shoppingCart");
+            shoppingCart = [];
+
+            renderCartSummaryItems();
+            updateHeaderCartCount();
+            closeModal();
+
+            openModal(transactionCompleteModal);
+        })
+        .catch((error) => {
+
+            console.error("Order submission error:", error);
+
+            if (error.errors) {
+                const errorMessages = Object.entries(error.errors)
+                    .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+                    .join("\n");
+
+                alert("Validation failed:\n" + errorMessages);
+            } else if (error.message) {
+                alert("Order submission failed: " + error.message);
+            } else {
+                alert("Order submission failed. Please try again.");
+            }
+        });
+    }
+
+  function handleSuccessfulTransaction1() {
     const receiptUploadABA = document.getElementById("receipt-upload-ABA");
     const receiptUploadACLEDA = document.getElementById("receipt-upload-ACLEDA");
     const firstName = document.getElementById('delivery-first-name')?.value.trim() || '';
@@ -468,26 +574,29 @@ document.addEventListener("DOMContentLoaded", () => {
     cardExpirationInput.addEventListener("input", formatExpirationDate);
     cardSecurityInput.addEventListener("input", formatSecurityCode);
 
+    let currentMD5 = null;
     // Event listeners for bank buttons to open their respective payment modals
     bankButtons.forEach((button) => {
         button.addEventListener("click", () => {
+
             if (shoppingCart.length === 0) {
-                alert(
-                    "Your cart is empty. Please add items to your cart before proceeding."
-                );
+                alert("Cart empty");
                 return;
             }
 
-            if (validateDeliveryFields()) {
-                const bankType = button.dataset.bank;
-                if (bankType === "acleda") {
-                    openModal(acledaModal);
-                } else if (bankType === "aba") {
-                    openModal(abaModal);
-                }
-            } else {
-                alert("Please fill in all required Delivery information.");
+            if (!validateDeliveryFields()) {
+                alert("Fill delivery info");
+                return;
             }
+
+            const bankType = button.dataset.bank;
+            const total = parseFloat(cartTotalPaymentSpan.textContent) || 0;
+
+            if (total <= 0) {
+                alert("Invalid amount");
+                return;
+            }
+
         });
     });
 
@@ -568,6 +677,32 @@ document.addEventListener("DOMContentLoaded", () => {
             closeModal();
         }
     });
+    function startCheckPayment() {
+
+        if (!window.currentMd5) return;
+
+        const interval = setInterval(() => {
+
+            fetch(`/check-payment?md5=${window.currentMd5}`)
+            .then(res => res.json())
+            .then(data => {
+
+                console.log("CHECK:", data);
+
+                if (data.status === "paid") {
+
+                    clearInterval(interval);
+
+                    status.innerText = "✅ Payment Success";
+
+                    // 🔥 CALL ORDER API HERE
+                    handleSuccessfulTransaction(data.payment_ref);
+                }
+
+            });
+
+        }, 3000); // check every 3 sec
+    }
 
     // Initial load for cart items in the summary when the page loads
     loadCartAndRender();
