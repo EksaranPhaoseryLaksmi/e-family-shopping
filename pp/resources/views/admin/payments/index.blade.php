@@ -78,7 +78,7 @@
 
                 <!-- 🔁 CHECK PAYMENT -->
                 @if($payment->status === 'pending')
-                  <form action="{{ route('admin.payments.check', $payment->payment_ref) }}" method="POST">
+                  <form action="{{ route('admin.payments.check', $payment->bakong_md5) }}" method="POST">
                     @csrf
                     <button class="action-btn approve">
                       <i class="fas fa-sync"></i> Check

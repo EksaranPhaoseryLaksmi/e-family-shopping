@@ -97,7 +97,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/orders/{order}/reject', [OrderController::class, 'reject'])->name('admin.orders.reject');
     Route::post('/admin/users/{user}/toggle', [AdminController::class, 'toggleActive'])->name('admin.users.toggle');
     Route::get('/payments', [AdminController::class, 'index'])->name('admin.payments');
-    Route::post('/payments/{id}/check', [AdminController::class, 'check']);
+    Route::post('/payments/{md5}/check', [AdminController::class, 'check'])
+        ->name('admin.payments.check');
     Route::get('/payments/{ref}', [AdminController::class, 'view'])
             ->name('admin.payments.view');
 });

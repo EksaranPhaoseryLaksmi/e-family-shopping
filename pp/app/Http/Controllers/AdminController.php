@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use App\Models\PaymentSession;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -234,9 +236,9 @@ class AdminController extends Controller
         return view('admin.payments.index', compact('payments'));
     }
 
-    public function check($id)
+    public function check($md5)
     {
-        $session = PaymentSession::findOrFail($id);
+        $session = PaymentSession::where('bakong_md5', $md5)->firstOrFail();
 
         $response = Http::post('http://127.0.0.1:3000/check-payment', [
             'md5' => $session->bakong_md5
@@ -273,7 +275,7 @@ class AdminController extends Controller
 
                 'delivery_name' => $session->delivery_name,
                 'delivery_address' => $session->delivery_address,
-                'delivery_email' => $session->delivery_email,
+                'delivery_email' => Auth::user()->email,
 
                 'status' => 'paid',
                 'receipt_no' => $session->payment_ref,
