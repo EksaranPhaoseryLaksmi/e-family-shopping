@@ -19,7 +19,7 @@
         <div class="bg-white rounded shadow p-6">
             <h2 class="text-lg font-semibold mb-2">Orders</h2>
             <p class="text-green-600">✅ Approved: <strong>{{ $statusCounts['approved'] ?? 0 }}</strong></p>
-            <p class="text-yellow-600">⏳ Pending: <strong>{{ $statusCounts['pending'] ?? 0 }}</strong></p>
+            <p class="text-yellow-600">⏳ Paid: <strong>{{ $statusCounts['paid'] ?? 0 }}</strong></p>
             <p class="text-red-600">❌ Rejected: <strong>{{ $statusCounts['rejected'] ?? 0 }}</strong></p>
         </div>
 

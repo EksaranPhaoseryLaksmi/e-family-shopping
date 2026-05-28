@@ -227,6 +227,47 @@
             text-decoration:underline;
         }
 
+        /* Password Strength */
+        .password-strength{
+            margin-top:12px;
+        }
+
+        .strength-bar{
+            width:100%;
+            height:8px;
+            background:rgba(255,255,255,0.12);
+            border-radius:999px;
+            overflow:hidden;
+        }
+
+        .strength-fill{
+            height:100%;
+            width:0%;
+            transition:0.3s ease;
+            border-radius:999px;
+        }
+
+        .strength-text{
+            margin-top:8px;
+            font-size:13px;
+            font-weight:600;
+        }
+
+        .password-rules{
+            margin-top:12px;
+        }
+
+        .rule{
+            font-size:13px;
+            margin-bottom:6px;
+            color:rgba(255,255,255,0.6);
+            transition:0.3s ease;
+        }
+
+        .rule.valid{
+            color:#4ade80;
+        }
+
         /* Loading Overlay */
         .loading-overlay{
             position:fixed;
@@ -374,24 +415,69 @@
 
             <div class="form-group">
                 <label class="form-label">Password</label>
+
                 <input
                     type="password"
+                    id="password"
                     name="password"
-                    placeholder="Enter password"
+                    placeholder="Enter strong password"
                     required
                     class="form-input"
                 >
+
+                <div class="password-strength">
+
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+
+                    <div class="strength-text" id="strengthText">
+                        Password Strength
+                    </div>
+
+                    <div class="password-rules">
+
+                        <div class="rule" id="lengthRule">
+                            ❌ Minimum 8 characters
+                        </div>
+
+                        <div class="rule" id="upperRule">
+                            ❌ At least 1 uppercase letter
+                        </div>
+
+                        <div class="rule" id="lowerRule">
+                            ❌ At least 1 lowercase letter
+                        </div>
+
+                        <div class="rule" id="numberRule">
+                            ❌ At least 1 number
+                        </div>
+
+                        <div class="rule" id="specialRule">
+                            ❌ At least 1 special character
+                        </div>
+
+                    </div>
+
+                </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Confirm Password</label>
+
                 <input
                     type="password"
+                    id="confirmPassword"
                     name="password_confirmation"
                     placeholder="Confirm password"
                     required
                     class="form-input"
                 >
+
+                <div
+                    id="passwordMatch"
+                    style="margin-top:8px;font-size:13px;"
+                ></div>
             </div>
 
             <div class="form-group">
@@ -451,12 +537,138 @@
         customerCard.classList.remove('active');
     });
 
+    // Password Strength
+    const passwordInput = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirmPassword');
+
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+
+    const lengthRule = document.getElementById('lengthRule');
+    const upperRule = document.getElementById('upperRule');
+    const lowerRule = document.getElementById('lowerRule');
+    const numberRule = document.getElementById('numberRule');
+    const specialRule = document.getElementById('specialRule');
+
+    const passwordMatch = document.getElementById('passwordMatch');
+
+    passwordInput.addEventListener('input', checkPasswordStrength);
+    confirmPassword.addEventListener('input', checkPasswordMatch);
+
+    function checkPasswordStrength(){
+
+        const password = passwordInput.value;
+
+        let score = 0;
+
+        const hasLength = password.length >= 8;
+        const hasUpper = /[A-Z]/.test(password);
+        const hasLower = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+        updateRule(lengthRule, hasLength);
+        updateRule(upperRule, hasUpper);
+        updateRule(lowerRule, hasLower);
+        updateRule(numberRule, hasNumber);
+        updateRule(specialRule, hasSpecial);
+
+        if(hasLength) score++;
+        if(hasUpper) score++;
+        if(hasLower) score++;
+        if(hasNumber) score++;
+        if(hasSpecial) score++;
+
+        let width = (score / 5) * 100;
+
+        strengthFill.style.width = width + '%';
+
+        if(score <= 2){
+            strengthFill.style.background = '#ef4444';
+            strengthText.innerHTML = 'Weak Password';
+            strengthText.style.color = '#fca5a5';
+        }
+        else if(score <= 4){
+            strengthFill.style.background = '#f59e0b';
+            strengthText.innerHTML = 'Medium Password';
+            strengthText.style.color = '#fde68a';
+        }
+        else{
+            strengthFill.style.background = '#22c55e';
+            strengthText.innerHTML = 'Strong Password';
+            strengthText.style.color = '#86efac';
+        }
+
+        checkPasswordMatch();
+    }
+
+    function updateRule(element, valid){
+
+        if(valid){
+            element.classList.add('valid');
+            element.innerHTML = element.innerHTML.replace('❌', '✅');
+        }else{
+            element.classList.remove('valid');
+            element.innerHTML = element.innerHTML.replace('✅', '❌');
+        }
+    }
+
+    function checkPasswordMatch(){
+
+        if(confirmPassword.value === ''){
+            passwordMatch.innerHTML = '';
+            return;
+        }
+
+        if(passwordInput.value === confirmPassword.value){
+            passwordMatch.innerHTML = '✅ Password matched';
+            passwordMatch.style.color = '#4ade80';
+        }else{
+            passwordMatch.innerHTML = '❌ Password not matched';
+            passwordMatch.style.color = '#f87171';
+        }
+    }
+
     // Loading Submit
     const registerForm = document.getElementById('registerForm');
     const loadingOverlay = document.getElementById('loadingOverlay');
     const registerBtn = document.getElementById('registerBtn');
 
-    registerForm.addEventListener('submit', function () {
+    registerForm.addEventListener('submit', function (e) {
+
+        const password = passwordInput.value;
+
+        const strongPassword =
+            password.length >= 8 &&
+            /[A-Z]/.test(password) &&
+            /[a-z]/.test(password) &&
+            /[0-9]/.test(password) &&
+            /[^A-Za-z0-9]/.test(password);
+
+        if(!strongPassword){
+
+            e.preventDefault();
+
+            alert(
+                'Password must contain:\n' +
+                '- Minimum 8 characters\n' +
+                '- 1 uppercase letter\n' +
+                '- 1 lowercase letter\n' +
+                '- 1 number\n' +
+                '- 1 special character'
+            );
+
+            return;
+        }
+
+        if(passwordInput.value !== confirmPassword.value){
+
+            e.preventDefault();
+
+            alert('Password confirmation does not match.');
+
+            return;
+        }
 
         loadingOverlay.classList.add('show');
 
@@ -466,6 +678,7 @@
 
     // Success Toast
     @if(session('success'))
+
         const successToast = document.getElementById('successToast');
 
         setTimeout(() => {
@@ -475,6 +688,7 @@
         setTimeout(() => {
             successToast.classList.remove('show');
         }, 3500);
+
     @endif
 
 </script>

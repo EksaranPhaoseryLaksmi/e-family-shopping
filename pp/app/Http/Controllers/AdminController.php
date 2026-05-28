@@ -112,7 +112,7 @@ class AdminController extends Controller
     $query->withCount([
     'orders as pending_orders_count' => function ($q) {
         $q->select(\DB::raw('COUNT(DISTINCT receipt_no)'))
-          ->where('status', 'pending');
+          ->where('status', 'paid');
     },
     'orders as approved_orders_count' => function ($q) {
         $q->select(\DB::raw('COUNT(DISTINCT receipt_no)'))
@@ -143,7 +143,7 @@ class AdminController extends Controller
     public function showOrders()
     {
     $orders = Order::with(['vendor', 'user'])->orderBy('created_at', 'desc')->get();
-    $pendingCount = VendorRequest::where('status', 'pending')->count();
+    $pendingCount = VendorRequest::where('status', 'paid')->count();
     return view('admin.orders', compact('orders', 'pendingCount'));
     }
 

@@ -310,7 +310,7 @@
 
                 <!-- Actions -->
                 <div class="p-6 bg-gray-50 border-t border-gray-100">
-                    @if($first->status === 'pending')
+                    @if($first->status === 'paid')
 
                         <div class="flex flex-wrap gap-3">
 

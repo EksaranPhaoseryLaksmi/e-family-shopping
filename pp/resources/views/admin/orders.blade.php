@@ -65,7 +65,7 @@
 
     <!-- Stats cards -->
     <section class="stats-grid mb-6">
-      <div class="stats-card"><h3>Pending Orders</h3><p>{{ $totalPending }}</p></div>
+      <div class="stats-card"><h3>Paid Orders</h3><p>{{ $totalPending }}</p></div>
       <div class="stats-card"><h3>Approved Orders</h3><p>{{ $totalApproved }}</p></div>
       <div class="stats-card"><h3>Rejected Orders</h3><p>{{ $totalRejected }}</p></div>
       <div class="stats-card"><h3>Total Orders</h3><p>{{ $totalOrders }}</p></div>
@@ -82,7 +82,7 @@
             <th class="px-4 py-2 border">Store Name</th>
             <th class="px-4 py-2 border">Store Type</th>
             <th class="px-4 py-2 border">Created At</th>
-            <th class="px-4 py-2 border">Pending Orders</th>
+            <th class="px-4 py-2 border">Paid Orders</th>
             <th class="px-4 py-2 border">Approved Orders</th>
             <th class="px-4 py-2 border">Rejected Orders</th>
             <th class="px-4 py-2 border">Total Orders</th>
