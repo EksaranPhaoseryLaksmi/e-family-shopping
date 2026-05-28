@@ -21,7 +21,7 @@
             color: white; /* Ensure text is visible */
 
             /* Background Image Properties */
-            background-image: url('{{ asset('photos/pay.jpg') }}'); /* REPLACE 'your_chosen_image.jpg' WITH YOUR ACTUAL FILENAME */
+            background-image: url('{{ asset('photos/pay.jpg') }}');
             background-size: cover;
             background-position: center center;
             background-repeat: no-repeat;
@@ -31,13 +31,51 @@
             min-height: 100vh; /* Ensure body covers full viewport height */
             z-index: 0; /* Ensure body is behind any overlay */
         }
-     .hide {
+        .hide {
             display: none !important;
         }
-    .pay-now-button {
-        display: none;
-    }
+        .pay-now-button {
+            display: none;
+        }
 
+        /* Loading UI States & Dynamic Visuals */
+        .bank-button.loading-state {
+            pointer-events: none;
+            opacity: 0.6;
+            position: relative;
+        }
+        .qr-code-placeholder {
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fdfdfd;
+            border-radius: 8px;
+            border: 2px dashed #ddd;
+            margin: 15px auto;
+            position: relative;
+        }
+        .spinner-loader {
+            border: 4px solid rgba(0,0,0,0.1);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border-left-color: #0975A8;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .text-error {
+            color: #d9534f !important;
+            font-weight: bold;
+        }
+        .text-success {
+            color: #2baf2b !important;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -45,21 +83,18 @@
         {{-- Logo as a link to home page --}}
         <a href="{{ url('/') }}" class="logo-link">
             <div class="logo">
-                {{-- Ensure 'e-commerce_logo.jpg' is in public/photos/ --}}
                 <img src="{{ asset('photos/e-commerce_logo.jpg') }}" alt="E-commerce Logo">
             </div>
         </a>
         <nav class="navbar">
             <ul>
-                {{-- Navigation links using Laravel's url() helper --}}
                 <li><a href="{{ url('/') }}">Home</a></li>
                 <li><a href="{{ url('/categories?type=1') }}">Categories</a></li>
-                <li><a href="{{ url('/#about') }}">About Us</a></li> {{-- Assuming #about is on the home page --}}
-                <li><a href="{{ url('/#templates') }}">Templates</a></li> {{-- Assuming #templates is on the home page --}}
-                <li><a href="{{ url('/#success') }}">Feedback</a></li> {{-- Assuming #success is on the home page --}}
-                <li><a href="{{ url('/#contact') }}">Contact</a></li> {{-- Assuming #contact is on the home page --}}
+                <li><a href="{{ url('/#about') }}">About Us</a></li>
+                <li><a href="{{ url('/#templates') }}">Templates</a></li>
+                <li><a href="{{ url('/#success') }}">Feedback</a></li>
+                <li><a href="{{ url('/#contact') }}">Contact</a></li>
 
-                {{-- Icon Buttons for Cart and Account (consistent with categories page) --}}
                 <li>
                     <button id="cart-icon-button-payment" class="icon-button">
                         <i class="fas fa-shopping-cart"></i>
@@ -88,67 +123,64 @@
         <section class="checkout-form">
             <h2>Express Checkout</h2>
             <div class="express-buttons">
-                {{-- Bank button images - ensure they are in public/photos/ --}}
                 <button type="button" class="bank-button khqr" id="khqr-btn">
-                    <img src="{{ asset('photos/ABA.jpg') }}">
+                    <img src="{{ asset('photos/ABA.jpg') }}" alt="ABA Pay">
+                    <span id="btn-spinner" style="display:none; margin-left:10px;"><i class="fas fa-spinner fa-spin"></i></span>
                 </button>
             </div>
             <p class="or-separator">OR</p>
 
             <div class="contact-section" style="display: none;">
-            <h3>Contact</h3>
-            <input type="email" id="contact-email" placeholder="Email">
-            <label class="checkbox-container">
-                <input type="checkbox" checked>
-                Email me with new and offers
-            </label>
+                <h3>Contact</h3>
+                <input type="email" id="contact-email" placeholder="Email">
+                <label class="checkbox-container">
+                    <input type="checkbox" checked>
+                    Email me with new and offers
+                </label>
             </div>
-           <div class="delivery-section">
-               <h3>Delivery</h3>
-               <p>It'll be right in front of your house.</p>
+            <div class="delivery-section">
+                <h3>Delivery</h3>
+                <p>It'll be right in front of your house.</p>
 
-               <select class="country-region" id="delivery-country">
-                   <option value="">Choose your country</option>
-                   <option value="cambodia">Cambodia</option>
-               </select>
+                <select class="country-region" id="delivery-country">
+                    <option value="">Choose your country</option>
+                    <option value="cambodia">Cambodia</option>
+                </select>
 
-               <div class="name-inputs">
-                   <input type="text" id="delivery-first-name" placeholder="First Name">
-                   <input type="text" id="delivery-last-name" placeholder="Last Name">
-               </div>
-
-               <input type="text" id="delivery-address" placeholder="Address">
-               <input type="text" id="delivery-apartment" placeholder="Apartment, suite, etc. (optional)">
-               <input type="text" id="delivery-city" placeholder="City">
-
-               <!-- ✅ NEW: Phone number -->
-               <input type="text" id="delivery-phone" placeholder="Phone Number (e.g. +855 12 345 678)">
-
-               <!-- ✅ NEW: Google Map link -->
-               <input type="text" id="delivery-map" placeholder="Google Maps link (optional)">
-           </div>
-            <div class="hide">
-            <div class="payment-section">
-                <h3>Payment</h3>
-                <p>All transactions are secure and encrypted.</p>
-                <div class="credit-card-section">
-                    <h4>Credit Card</h4>
-                    <div class="card-icons">
-                        {{-- Added common card icons as Font Awesome --}}
-                        <i class="fab fa-cc-visa"></i>
-                        <i class="fab fa-cc-mastercard"></i>
-                        <i class="fab fa-cc-amex"></i>
-                        <i class="fab fa-cc-discover"></i>
-                    </div>
-                    <input type="text" id="card-number" placeholder="Card number (e.g., 0000-0000-0000-0000)" maxlength="19">
-                    <div class="card-details">
-                        <input type="text" id="card-expiration" placeholder="MM/YY" maxlength="5">
-                        <input type="text" id="card-security" placeholder="CVV (e.g., 000)" maxlength="4">
-                        <span class="tooltip-icon">?</span>
-                    </div>
-                    <input type="text" id="card-name" placeholder="Name on card">
+                <div class="name-inputs">
+                    <input type="text" id="delivery-first-name" placeholder="First Name">
+                    <input type="text" id="delivery-last-name" placeholder="Last Name">
                 </div>
+
+                <input type="text" id="delivery-address" placeholder="Address">
+                <input type="text" id="delivery-apartment" placeholder="Apartment, suite, etc. (optional)">
+                <input type="text" id="delivery-city" placeholder="City">
+
+                <input type="text" id="delivery-phone" placeholder="Phone Number (e.g. +855 12 345 678)">
+
+                <input type="text" id="delivery-map" placeholder="Google Maps link (optional)">
             </div>
+            <div class="hide">
+                <div class="payment-section">
+                    <h3>Payment</h3>
+                    <p>All transactions are secure and encrypted.</p>
+                    <div class="credit-card-section">
+                        <h4>Credit Card</h4>
+                        <div class="card-icons">
+                            <i class="fab fa-cc-visa"></i>
+                            <i class="fab fa-cc-mastercard"></i>
+                            <i class="fab fa-cc-amex"></i>
+                            <i class="fab fa-cc-discover"></i>
+                        </div>
+                        <input type="text" id="card-number" placeholder="Card number (e.g., 0000-0000-0000-0000)" maxlength="19">
+                        <div class="card-details">
+                            <input type="text" id="card-expiration" placeholder="MM/YY" maxlength="5">
+                            <input type="text" id="card-security" placeholder="CVV (e.g., 000)" maxlength="4">
+                            <span class="tooltip-icon">?</span>
+                        </div>
+                        <input type="text" id="card-name" placeholder="Name on card">
+                    </div>
+                </div>
             </div>
             <button class="pay-now-button">Pay Now</button>
             <p class="privacy-info">Your info will be saved to a Shop account. By continuing, you agree to Shop's Terms of Service and acknowledge the Privacy Policy.</p>
@@ -157,7 +189,6 @@
         <section class="order-summary">
             <div class="order-summary-header">
                 <h3>Cart summary</h3>
-                {{-- Removed: <button id="edit-cart-button" class="edit-button">Edit</button> --}}
             </div>
             <div class="product-list-container" id="product-list-container-payment">
                 <p class="text-center text-gray-500 empty-cart-message">Your cart is empty.</p>
@@ -175,8 +206,7 @@
         </section>
     </main>
 
-
-    {{-- Cart Pop-up Modal (same structure as categories, but ensure only one is active at a time if navigating) --}}
+    {{-- Cart Pop-up Modal --}}
     <div id="cartModal" class="hide">
         <div class="modal-content">
             <span class="close-button">&times;</span>
@@ -194,7 +224,6 @@
         </div>
     </div>
 
-    <!-- KHQR (Bakong) Payment Modal -->
     <div id="khqrModal" class="payment-modal">
         <div class="modal-content aba-modal">
             <div class="modal-header">
@@ -205,19 +234,17 @@
             </div>
 
             <div class="modal-body">
-                <img src="{{ asset('photos/bakong.png') }}" class="bakong-logo">
+                <img src="{{ asset('photos/bakong.png') }}" class="bakong-logo" alt="Bakong">
                 <p class="account-name">SENG BUN</p>
                 <p class="account-amount">$ <span id="khqr-amount">0.00</span></p>
 
-                <div class="qr-code-placeholder">
-                    <img id="khqr-image" class="qr-code-image" style="display:none;">
-
+                <div class="qr-code-placeholder" id="qr-container">
+                    <div class="spinner-loader" id="qr-spinner"></div>
+                    <img id="khqr-image" class="qr-code-image" style="display:none;" alt="KHQR Code">
                 </div>
                 <p id="khqr-status">⏳ Generating QR...</p>
                 <p id="countdown" style="font-size:14px; margin-top:10px; font-weight:bold;"></p>
                 <p class="qr-instruction">Scan with ABA / ACLEDA / Wing</p>
-
-             <!--   <button class="scan-complete-button">I Paid</button> -->
             </div>
         </div>
     </div>
@@ -229,35 +256,34 @@
                 <i class="fas fa-check-circle success-icon"></i>
                 <h3 class="success-message-title">Transaction Complete!</h3>
                 <p class="success-message-text">Your order has been successfully placed. Thank you for shopping with us!</p>
-                <button class="close-transaction-modal-button">Continue Shopping</button>
+                <button class="close-transaction-modal-button" id="success-continue-btn">Continue Shopping</button>
             </div>
         </div>
     </div>
-
-    {{-- JavaScript files - assuming they are in public/js/ --}}
-    {{-- <script src="{{ asset('js/script.js') }}"></script> --}} <!-- Removed as per previous instructions -->
 
 </body>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
     const khqrBtn = document.getElementById("khqr-btn");
+    const btnSpinner = document.getElementById("btn-spinner");
     const khqrModal = document.getElementById("khqrModal");
     const qrImg = document.getElementById("khqr-image");
+    const qrSpinner = document.getElementById("qr-spinner");
     const status = document.getElementById("khqr-status");
     const amountText = document.getElementById("khqr-amount");
     const countdown = document.getElementById("countdown");
     const transactionCompleteModal = document.getElementById("transactionCompleteModal");
+    const successContinueBtn = document.getElementById("success-continue-btn");
     const total = document.getElementById("cart-total-payment");
-    const phone = document.getElementById('delivery-phone')?.value.trim() || '';
-    const mapLink = document.getElementById('delivery-map')?.value.trim() || '';
-    let timerInterval = null;     // For the countdown UI
-    let pollingInterval = null;   // For the checkPayment API calls
+
+    let timerInterval = null;
+    let pollingInterval = null;
     let isLoading = false;
     let currentRequest = null;
 
     // ==========================================
-    // STOP ALL PROCESSES (Clear intervals)
+    // STOP ALL PROCESSES (Clear intervals & UI resetting)
     // ==========================================
     function stopPaymentProcesses() {
         if (timerInterval) clearInterval(timerInterval);
@@ -278,10 +304,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const diff = expTime - now;
 
             if (diff <= 0) {
-                stopPaymentProcesses(); // 🛑 STOP checking payment when expired
+                stopPaymentProcesses();
                 countdown.innerHTML = "❌ QR EXPIRED";
-                status.innerText = "Please generate new QR";
-                qrImg.style.opacity = "0.3";
+                status.className = "text-error";
+                status.innerText = "Please generate a new QR code.";
+                qrImg.style.opacity = "0.2";
                 isLoading = false;
                 return;
             }
@@ -296,7 +323,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // CHECK PAYMENT STATUS (POLLING)
     // ==========================================
     function startCheckPayment() {
-        // Clear any existing polling first
         if (pollingInterval) clearInterval(pollingInterval);
 
         pollingInterval = setInterval(() => {
@@ -306,13 +332,21 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(res => res.json())
             .then(data => {
                 if (data.status === "paid") {
-                    stopPaymentProcesses(); // 🛑 STOP checking once paid
-                    status.innerText = "✅ Payment Success";
+                    stopPaymentProcesses();
+                    status.className = "text-success";
+                    status.innerText = "✅ Payment Success!";
+
+                    // Clear cart data
                     localStorage.removeItem("shoppingCart");
-                    openModal(transactionCompleteModal);
+
+                    // Clear specific visuals and trigger Success Modal
+                    setTimeout(() => {
+                        khqrModal.style.display = "none";
+                        openModal(transactionCompleteModal);
+                    }, 1000);
                 }
             })
-            .catch(err => console.error("Polling error:", err));
+            .catch(err => console.error("Polling status checkpoint failed:", err));
         }, 3000);
     }
 
@@ -333,12 +367,19 @@ document.addEventListener("DOMContentLoaded", function () {
         if (isLoading) return;
         isLoading = true;
 
+        // Toggle Loading Button UI State
+        khqrBtn.classList.add("loading-state");
+        if(btnSpinner) btnSpinner.style.display = "inline-block";
+
         const amount = parseFloat(total?.innerText || 0);
         amountText.innerText = amount.toFixed(2);
 
+        // Prep Modal UI display for processing
         khqrModal.style.display = "flex";
-        status.innerText = "⏳ Generating QR...";
+        status.className = "";
+        status.innerText = "⏳ Requesting dynamic QR string...";
         qrImg.style.display = "none";
+        qrSpinner.style.display = "block"; // Turn on inner modal loader
         countdown.innerHTML = "";
 
         if (currentRequest) currentRequest.abort();
@@ -356,47 +397,85 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify({
                 cart: shoppingCart,
                 amount: amount,
-                delivery_name: document.getElementById('delivery-first-name').value + ' ' + document.getElementById('delivery-last-name').value,
-                delivery_address: document.getElementById('delivery-address').value + ', ' + document.getElementById('delivery-city').value,
-                delivery_email: document.getElementById('contact-email').value,
+                delivery_name: (document.getElementById('delivery-first-name')?.value || '') + ' ' + (document.getElementById('delivery-last-name')?.value || ''),
+                delivery_address: (document.getElementById('delivery-address')?.value || '') + ', ' + (document.getElementById('delivery-city')?.value || ''),
+                delivery_email: document.getElementById('contact-email')?.value || '',
                 delivery_phone: document.getElementById('delivery-phone')?.value.trim() || '',
                 delivery_map: document.getElementById('delivery-map')?.value.trim() || '',
-            })
+            }),
+            signal: controller.signal
         })
-        .then(res => res.json())
         .then(res => {
+            if (!res.ok) throw new Error("Server response error occurred.");
+            return res.json();
+        })
+        .then(res => {
+            if(!res.qrString) {
+                throw new Error("Invalid checkout payload details.");
+            }
+
             window.paymentRef = res.payment_ref;
+
+            // Generate standard image URL structure
             qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(res.qrString)}`;
-            qrImg.style.display = "block";
-            status.innerText = "Scan to pay 💳";
+
+            // Ensure visual spinner removes only when imagery fetches completely
+            qrImg.onload = function() {
+                qrSpinner.style.display = "none";
+                qrImg.style.display = "block";
+                status.innerText = "Scan to pay 💳";
+
+                // Clear active button loader structures
+                khqrBtn.classList.remove("loading-state");
+                if(btnSpinner) btnSpinner.style.display = "none";
+                isLoading = false;
+            };
 
             startCountdown(res.expiration);
             startCheckPayment();
-            isLoading = false;
         })
         .catch(err => {
             if (err.name === "AbortError") return;
-            status.innerText = "❌ Error generating QR";
+            console.error(err);
+
+            // Clean up loaders on exception instances
+            qrSpinner.style.display = "none";
+            khqrBtn.classList.remove("loading-state");
+            if(btnSpinner) btnSpinner.style.display = "none";
+
+            status.className = "text-error";
+            status.innerText = "❌ Error generating QR. Please try again.";
             isLoading = false;
         });
     });
 
     // ==========================================
-    // CLOSE MODAL / BACK BUTTON
+    // CLOSE MODAL / BACK BUTTONS
     // ==========================================
     document.querySelectorAll(".modal-back-button").forEach(btn => {
         btn.addEventListener("click", function () {
             khqrModal.style.display = "none";
-
-            stopPaymentProcesses(); // 🛑 STOP checking payment when user closes modal
+            stopPaymentProcesses();
 
             qrImg.style.opacity = "1";
             qrImg.style.display = "none";
+            qrSpinner.style.display = "none";
             countdown.innerHTML = "";
             status.innerText = "";
+            status.className = "";
+
+            khqrBtn.classList.remove("loading-state");
+            if(btnSpinner) btnSpinner.style.display = "none";
             isLoading = false;
         });
     });
+
+    // Redirect when transaction success continues
+    if(successContinueBtn) {
+        successContinueBtn.addEventListener("click", function() {
+            window.location.href = "{{ url('/') }}";
+        });
+    }
 });
 </script>
 <script src="{{ asset('js/payment.js') }}"></script>

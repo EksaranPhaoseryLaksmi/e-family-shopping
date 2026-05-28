@@ -46,6 +46,19 @@
 
   <!-- Main Content -->
   <main class="main-content">
+      @if(session('success'))
+          <div id="alertBox"
+               class="mb-4 p-4 rounded bg-green-100 text-green-800 border border-green-300">
+              {{ session('success') }}
+          </div>
+      @endif
+
+      @if(session('error'))
+          <div id="alertBox"
+               class="mb-4 p-4 rounded bg-red-100 text-red-800 border border-red-300">
+              {{ session('error') }}
+          </div>
+      @endif
     <header class="header">
       <script src="https://cdn.tailwindcss.com"></script>
       <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
@@ -114,14 +127,24 @@
                 @if($vendor->status === 'pending')
                   <form action="{{ route('admin.vendors.approve', $vendor->id) }}" method="POST" style="display:inline-block;">
                     @csrf
-                    <button type="submit" class="action-btn approve" title="Approve">
-                      <i class="fas fa-check"></i> Approve
+                    <button type="submit"
+                            class="action-btn approve submit-btn"
+                            title="Approve">
+
+                        <i class="fas fa-check"></i>
+                        <span class="btn-text">Approve</span>
+
                     </button>
                   </form>
                   <form action="{{ route('admin.vendors.reject', $vendor->id) }}" method="POST" style="display:inline-block;">
                     @csrf
-                    <button type="submit" class="action-btn reject" title="Reject">
-                      <i class="fas fa-times"></i> Reject
+                    <button type="submit"
+                            class="action-btn reject submit-btn"
+                            title="Reject">
+
+                        <i class="fas fa-times"></i>
+                        <span class="btn-text">Reject</span>
+
                     </button>
                   </form>
                 @else
@@ -135,8 +158,13 @@
                 <form action="{{ route('admin.vendors.delete', $vendor->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure?');">
                   @csrf
                   @method('DELETE')
-                  <button type="submit" class="action-btn delete" title="Delete Vendor">
-                    <i class="fas fa-trash-alt"></i> Delete
+                  <button type="submit"
+                          class="action-btn delete submit-btn"
+                          title="Delete Vendor">
+
+                      <i class="fas fa-trash-alt"></i>
+                      <span class="btn-text">Delete</span>
+
                   </button>
                 </form>
               </td>
@@ -152,6 +180,83 @@
     </section>
   </main>
 </div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
 
+    <div class="bg-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3">
+
+        <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
+
+        <span class="text-lg font-semibold">
+            Processing Request...
+        </span>
+
+    </div>
+
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // =========================
+    // AUTO HIDE ALERT
+    // =========================
+    const alertBox = document.getElementById("alertBox");
+
+    if (alertBox) {
+
+        setTimeout(() => {
+
+            alertBox.style.transition = "0.5s";
+            alertBox.style.opacity = "0";
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 500);
+
+        }, 3000);
+    }
+
+    // =========================
+    // FORM LOADING
+    // =========================
+    const forms = document.querySelectorAll("form");
+
+    forms.forEach(form => {
+
+        form.addEventListener("submit", function () {
+
+            const overlay =
+                document.getElementById("loadingOverlay");
+
+            overlay.classList.remove("hidden");
+            overlay.classList.add("flex");
+
+            // disable buttons
+            const buttons =
+                form.querySelectorAll("button");
+
+            buttons.forEach(btn => {
+
+                btn.disabled = true;
+
+                const btnText =
+                    btn.querySelector(".btn-text");
+
+                if (btnText) {
+                    btnText.innerText = "Processing...";
+                }
+
+                btn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            });
+
+        });
+
+    });
+
+});
+</script>
 </body>
 </html>

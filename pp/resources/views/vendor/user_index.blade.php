@@ -2,12 +2,29 @@
 
 @section('content')
     <br/>
+    @if(session('success'))
+        <div id="alertBox"
+             class="mb-4 p-4 rounded bg-green-100 text-green-800 border border-green-300">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div id="alertBox"
+             class="mb-4 p-4 rounded bg-red-100 text-red-800 border border-red-300">
+            {{ session('error') }}
+        </div>
+    @endif
 <div class="max-w-8xl mx-auto bg-white p-6 rounded-xl shadow-md space-y-6">
   <!-- Header and Create Vendor Button -->
   <div class="flex items-center justify-between mb-8">
     <h1 class="text-2xl font-bold text-gray-800">🛍️ Vendors</h1>
-    <a href="{{ route('vendor.create') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+    <a href="{{ route('vendor.create') }}"
+       onclick="showLoading()"
+       class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+
       ➕ Create New Vendor
+
     </a>
   </div>
     <!-- Filter/Search Form -->
@@ -38,8 +55,12 @@
   </div>
   <div>
         <button type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            Search
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 submit-btn">
+
+            <span class="btn-text">
+                Search
+            </span>
+
         </button>
   </div>
 </form>
@@ -72,7 +93,7 @@
               <td class="px-4 py-3">{{ $vendor->email }}</td>
               <td class="px-4 py-3">{{ $vendor->phone }}</td>
               <td class="px-4 py-3">
-                <span class="px-2 py-1 rounded-full text-xs font-medium text-white 
+                <span class="px-2 py-1 rounded-full text-xs font-medium text-white
                   {{ $vendor->status === 'approved' ? 'bg-green-500' : 'bg-yellow-500' }}">
                   {{ ucfirst($vendor->status) }}
                 </span>
@@ -80,12 +101,18 @@
               <td class="px-4 py-3 text-center">
                 @if($vendor->status === 'approved')
                    <a href="{{ route('store.products', $vendor->id) }}"
-                    class="inline-block bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 text-sm">
-                        📦 View Products
-                    </a>
-                  <a href="{{ route('product.create', $vendor->id) }}" 
+                      onclick="showLoading()"
+                      class="inline-block bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700 text-sm">
+
+                       📦 View Products
+
+                   </a>
+                  <a href="{{ route('product.create', $vendor->id) }}"
+                     onclick="showLoading()"
                      class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm">
-                    ➕ Add Product
+
+                      ➕ Add Product
+
                   </a>
                 @else
                   <span class="text-xs text-gray-400 italic">Pending Approval</span>
@@ -105,4 +132,49 @@
     </div>
 @endif
 </div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+
+    <div class="bg-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3">
+
+        <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
+
+        <span class="text-lg font-semibold">
+            Loading Vendors...
+        </span>
+
+    </div>
+
+</div>
+<script>
+
+function showLoading() {
+
+    const overlay =
+        document.getElementById("loadingOverlay");
+
+    if (!overlay) return;
+
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
+
+}
+
+// Auto hide on page load/back
+window.addEventListener("pageshow", function () {
+
+    const overlay =
+        document.getElementById("loadingOverlay");
+
+    if (overlay) {
+
+        overlay.classList.add("hidden");
+        overlay.classList.remove("flex");
+
+    }
+
+});
+
+</script>
 @endsection

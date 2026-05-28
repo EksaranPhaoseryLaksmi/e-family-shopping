@@ -12,6 +12,23 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
+    @if(session('success'))
+        <div id="alertBox"
+             class="fixed top-4 right-4 z-50 bg-green-100 text-green-800 border border-green-300 px-4 py-3 rounded shadow-lg">
+
+            {{ session('success') }}
+
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div id="alertBox"
+             class="fixed top-4 right-4 z-50 bg-red-100 text-red-800 border border-red-300 px-4 py-3 rounded shadow-lg">
+
+            {{ session('error') }}
+
+        </div>
+    @endif
         <!-- Step 1 -->
         <div id="step1" class="container">
             <h2>CREATE YOUR STORE</h2>
@@ -35,7 +52,13 @@
                 <button data-value="0">Let website do it for you</button>
             </div>
 
-            <button id="next1">Next →</button>
+           <button id="next1" class="submit-btn">
+
+               <span class="btn-text">
+                   Next →
+               </span>
+
+           </button>
         </div>
 
         <!-- Step 2 -->
@@ -66,7 +89,13 @@
             </div>
 
             <button id="back">← Back</button>
-            <button id="createStore">Create Store</button>
+            <button id="createStore" class="submit-btn">
+
+                <span class="btn-text">
+                    Create Store
+                </span>
+
+            </button>
         </div>
 
     <!-- Product Page -->
@@ -77,11 +106,133 @@
         <!-- Product Row -->
         <div id="productList" class="product-list"></div>
 
-        <button id="addMore">Add More</button>
+        <button id="addMore" class="submit-btn">
+
+            <span class="btn-text">
+                Add More
+            </span>
+
+        </button>
         <br/>
         <br/>
     </div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay"
+     class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 items-center justify-center">
 
+    <div class="bg-white px-6 py-4 rounded-xl shadow-xl flex items-center gap-3">
+
+        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+
+        <span class="text-lg font-semibold text-gray-700">
+            Processing...
+        </span>
+
+    </div>
+
+</div>
+<script>
+
+// =========================
+// SHOW LOADING
+// =========================
+function showLoading() {
+
+    const overlay =
+        document.getElementById("loadingOverlay");
+
+    if (!overlay) return;
+
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
+}
+
+// =========================
+// HIDE LOADING
+// =========================
+function hideLoading() {
+
+    const overlay =
+        document.getElementById("loadingOverlay");
+
+    if (!overlay) return;
+
+    overlay.classList.add("hidden");
+    overlay.classList.remove("flex");
+}
+
+// =========================
+// PAGE READY
+// =========================
+document.addEventListener("DOMContentLoaded", function () {
+
+    // -------------------------
+    // AUTO HIDE ALERT
+    // -------------------------
+    const alertBox =
+        document.getElementById("alertBox");
+
+    if (alertBox) {
+
+        setTimeout(() => {
+
+            alertBox.style.transition = "0.5s";
+            alertBox.style.opacity = "0";
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 500);
+
+        }, 3000);
+    }
+
+    // -------------------------
+    // BUTTON LOADING
+    // -------------------------
+    const buttons =
+        document.querySelectorAll(".submit-btn");
+
+    buttons.forEach(btn => {
+
+        btn.addEventListener("click", function () {
+
+            showLoading();
+
+            btn.disabled = true;
+
+            const btnText =
+                btn.querySelector(".btn-text");
+
+            if (btnText) {
+
+                btnText.innerHTML =
+                    'Loading...';
+
+            }
+
+        });
+
+    });
+
+});
+
+// =========================
+// FIX BACK BUTTON STUCK
+// =========================
+window.addEventListener("pageshow", function () {
+
+    hideLoading();
+
+    document.querySelectorAll(".submit-btn")
+        .forEach(btn => {
+
+            btn.disabled = false;
+
+        });
+
+});
+
+</script>
     {{-- Linking to external JavaScript using Laravel's asset helper --}}
     <script src="{{ asset('js/vendor-script.js') }}"></script>
 </body>

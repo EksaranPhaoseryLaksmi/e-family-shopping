@@ -12,7 +12,7 @@
             /* Fallback dark background */
             background-color: #1a1a1a;
             color: white; /* Ensure text is visible */
-            
+
             /* Background Image Properties - UPDATED TO USE LARAVEL ASSET */
             background-image: url('{{ asset('photos/log.jpg') }}'); /* REPLACE 'your_chosen_image.jpg' WITH YOUR ACTUAL FILENAME */
             background-size: cover;
@@ -22,7 +22,7 @@
 
             position: relative; /* Needed for the pseudo-element overlay */
             min-height: 100vh; /* Ensure body covers full viewport height */
-            
+
             /* Flexbox for centering is already in Tailwind classes on body */
             z-index: 0; /* Ensure body is behind any overlay */
         }
@@ -42,7 +42,7 @@
         /* Style for the form container */
         .auth-form-container {
             /* Semi-transparent background for the form itself */
-            background-color: rgba(255, 255, 255, 0.1); 
+            background-color: rgba(255, 255, 255, 0.1);
             border-radius: 1.5rem; /* Increased border-radius for more rounded look, Tailwind: rounded-3xl equivalent */
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7); /* Stronger, darker shadow */
             position: relative; /* Position above the overlay */
@@ -165,7 +165,19 @@
 
     <div class="auth-form-container">
         <h2>Login</h2>
+@if(session('success'))
+    <div id="alertBox"
+         class="bg-green-100 text-green-700 p-4 rounded mb-4 border border-green-400">
+        {{ session('success') }}
+    </div>
+@endif
 
+@if(session('error'))
+    <div id="alertBox"
+         class="bg-red-100 text-red-700 p-4 rounded mb-4 border border-red-400">
+        {{ session('error') }}
+    </div>
+@endif
         @if ($errors->any())
             <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
                 <ul class="list-disc list-inside">
@@ -189,7 +201,14 @@
                 <input type="password" name="password" required class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
             </div>
 
-            <button type="submit" class="w-full">Login</button>
+            <button type="submit"
+                    class="w-full submit-btn">
+
+                <span class="btn-text">
+                    Login
+                </span>
+
+            </button>
         </form>
 
         <p class="mt-4 text-center">
@@ -197,6 +216,86 @@
             <a href="{{ route('register') }}">Register here</a>
         </p>
     </div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
 
+    <div class="bg-white px-6 py-4 rounded-xl shadow-xl flex items-center gap-3">
+
+        <i class="fas fa-spinner fa-spin text-yellow-500 text-2xl"></i>
+
+        <span class="text-lg font-semibold text-black">
+            Signing In...
+        </span>
+
+    </div>
+
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // =========================
+    // AUTO HIDE ALERT
+    // =========================
+    const alertBox =
+        document.getElementById("alertBox");
+
+    if (alertBox) {
+
+        setTimeout(() => {
+
+            alertBox.style.transition = "0.5s";
+            alertBox.style.opacity = "0";
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 500);
+
+        }, 3000);
+    }
+
+    // =========================
+    // LOGIN FORM LOADING
+    // =========================
+    const forms =
+        document.querySelectorAll("form");
+
+    forms.forEach(form => {
+
+        form.addEventListener("submit", function () {
+
+            // Show overlay
+            const overlay =
+                document.getElementById("loadingOverlay");
+
+            overlay.classList.remove("hidden");
+            overlay.classList.add("flex");
+
+            // Disable all buttons
+            const buttons =
+                form.querySelectorAll("button");
+
+            buttons.forEach(btn => {
+
+                btn.disabled = true;
+
+                const btnText =
+                    btn.querySelector(".btn-text");
+
+                if (btnText) {
+                    btnText.innerText = "Signing In...";
+                }
+
+                btn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+
+            });
+
+        });
+
+    });
+
+});
+</script>
 </body>
 </html>

@@ -22,15 +22,31 @@
     </div>
     <div>
         <button type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            Search
+            class="submit-btn px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+
+            <span class="btn-text">
+                Search
+            </span>
+
         </button>
     </div>
 </form>
 </div>
     @if(session('success'))
-        <div class="mb-4 text-green-700 bg-green-100 px-4 py-2 rounded">
+        <div id="alertBox"
+             class="mb-4 text-green-700 bg-green-100 border border-green-300 px-4 py-3 rounded">
+
             {{ session('success') }}
+
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div id="alertBox"
+             class="mb-4 text-red-700 bg-red-100 border border-red-300 px-4 py-3 rounded">
+
+            {{ session('error') }}
+
         </div>
     @endif
     <!-- Products Table -->
@@ -79,7 +95,13 @@
                             </span>
                         </td>
                         <td class="px-4 py-2 border text-sm">
-                            <a href="{{ route('product.edit', $product->id) }}" class="text-yellow-600 hover:underline block">✏️ Edit</a>
+                            <a href="{{ route('product.edit', $product->id) }}"
+                               onclick="showLoading()"
+                               class="text-yellow-600 hover:underline block">
+
+                                ✏️ Edit
+
+                            </a>
                             <details class="inline-block">
                                 <summary class="text-red-600 hover:underline cursor-pointer mt-1">🗑️ Delete</summary>
                                 <div class="mt-2 bg-white border rounded-lg shadow-md p-4 w-64">
@@ -91,11 +113,17 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
-                                                class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">Yes</button>
+                                            class="submit-btn px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">
+
+                                                <span class="btn-text">
+                                                    Yes
+                                                </span>
+
+                                            </button>
                                         </form>
                                     </div>
                                 </div>
-                            </details>     
+                            </details>
                         </td>
                     </tr>
                 @empty
@@ -114,4 +142,124 @@
 
     </div>
 </div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+
+    <div class="bg-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3">
+
+        <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
+
+        <span class="text-lg font-semibold">
+            Loading Products...
+        </span>
+
+    </div>
+
+</div>
+<script>
+
+// =========================
+// SHOW LOADING
+// =========================
+function showLoading() {
+
+    const overlay =
+        document.getElementById("loadingOverlay");
+
+    if (!overlay) return;
+
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
+
+}
+
+// =========================
+// HIDE LOADING
+// =========================
+function hideLoading() {
+
+    const overlay =
+        document.getElementById("loadingOverlay");
+
+    if (!overlay) return;
+
+    overlay.classList.add("hidden");
+    overlay.classList.remove("flex");
+
+}
+
+// =========================
+// PAGE READY
+// =========================
+document.addEventListener("DOMContentLoaded", function () {
+
+    // -------------------------
+    // AUTO HIDE ALERT
+    // -------------------------
+    const alertBox =
+        document.getElementById("alertBox");
+
+    if (alertBox) {
+
+        setTimeout(() => {
+
+            alertBox.style.transition = "0.5s";
+            alertBox.style.opacity = "0";
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 500);
+
+        }, 3000);
+
+    }
+
+    // -------------------------
+    // FORM SUBMIT LOADING
+    // -------------------------
+    const forms =
+        document.querySelectorAll("form");
+
+    forms.forEach(form => {
+
+        form.addEventListener("submit", function () {
+
+            showLoading();
+
+            const buttons =
+                form.querySelectorAll(".submit-btn");
+
+            buttons.forEach(btn => {
+
+                btn.disabled = true;
+
+                btn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            });
+
+        });
+
+    });
+
+});
+
+// =========================
+// FIX BACK BUTTON STUCK
+// =========================
+window.addEventListener("pageshow", function () {
+
+    hideLoading();
+
+    document.querySelectorAll(".submit-btn")
+        .forEach(btn => {
+
+            btn.disabled = false;
+
+        });
+
+});
+
+</script>
 @endsection

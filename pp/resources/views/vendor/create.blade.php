@@ -2,6 +2,23 @@
 
 @section('content')
 <br/>
+@if(session('success'))
+    <div id="alertBox"
+         class="mb-4 p-4 rounded bg-green-100 text-green-800 border border-green-300">
+
+        {{ session('success') }}
+
+    </div>
+@endif
+
+@if(session('error'))
+    <div id="alertBox"
+         class="mb-4 p-4 rounded bg-red-100 text-red-800 border border-red-300">
+
+        {{ session('error') }}
+
+    </div>
+@endif
 <div class="max-w-5xl mx-auto bg-white p-6 rounded-xl shadow-md space-y-6">
   <form method="POST" action="{{ route('vendor.store') }}" id="storeForm" novalidate class="grid gap-4">
     @csrf
@@ -28,8 +45,16 @@
         <label class="block"><input type="radio" name="delivery" value="0" class="mr-2"> Let website do it for you</label>
       </div>
 <br/>
-      <button type="button" id="next1" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Next →</button>
-    </div>
+      <button type="button"
+              id="next1"
+              class="submit-btn mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+
+          <span class="btn-text">
+              Next →
+          </span>
+
+      </button>
+  </div>
 
     <!-- Step 2 -->
     <div id="step2" class="space-y-4 hidden">
@@ -83,12 +108,185 @@
       </div>
 
       <div class="flex justify-between">
-        <button type="button" id="back" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">← Back</button>
-        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Create Store</button>
+        <button type="button"
+                id="back"
+                class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+
+            ← Back
+
+        </button>
+        <button type="submit"
+                class="submit-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+
+            <span class="btn-text">
+                Create Store
+            </span>
+
+        </button>
       </div>
     </div>
   </form>
 </div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
+
+    <div class="bg-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3">
+
+        <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
+
+        <span class="text-lg font-semibold">
+            Processing Store...
+        </span>
+
+    </div>
+
+</div>
+<script>
+
+const step1 =
+    document.getElementById('step1');
+
+const step2 =
+    document.getElementById('step2');
+
+// =========================
+// SHOW LOADING
+// =========================
+function showLoading() {
+
+    const overlay =
+        document.getElementById("loadingOverlay");
+
+    if (!overlay) return;
+
+    overlay.classList.remove("hidden");
+    overlay.classList.add("flex");
+}
+
+// =========================
+// HIDE LOADING
+// =========================
+function hideLoading() {
+
+    const overlay =
+        document.getElementById("loadingOverlay");
+
+    if (!overlay) return;
+
+    overlay.classList.add("hidden");
+    overlay.classList.remove("flex");
+}
+
+// =========================
+// NEXT STEP
+// =========================
+document.getElementById('next1')
+    .onclick = () => {
+
+    step1.classList.add('hidden');
+    step2.classList.remove('hidden');
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+
+};
+
+// =========================
+// BACK STEP
+// =========================
+document.getElementById('back')
+    .onclick = () => {
+
+    step2.classList.add('hidden');
+    step1.classList.remove('hidden');
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+
+};
+
+// =========================
+// PAGE READY
+// =========================
+document.addEventListener("DOMContentLoaded", function () {
+
+    // -------------------------
+    // AUTO HIDE ALERT
+    // -------------------------
+    const alertBox =
+        document.getElementById("alertBox");
+
+    if (alertBox) {
+
+        setTimeout(() => {
+
+            alertBox.style.transition = "0.5s";
+            alertBox.style.opacity = "0";
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 500);
+
+        }, 3000);
+    }
+
+    // -------------------------
+    // FORM SUBMIT
+    // -------------------------
+    const form =
+        document.getElementById("storeForm");
+
+    form.addEventListener("submit", function () {
+
+        showLoading();
+
+        // Disable buttons
+        document.querySelectorAll(".submit-btn")
+            .forEach(btn => {
+
+                btn.disabled = true;
+
+                const btnText =
+                    btn.querySelector(".btn-text");
+
+                if (btnText) {
+
+                    btnText.innerHTML =
+                        'Processing...';
+
+                }
+
+                btn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            });
+
+    });
+
+});
+
+// =========================
+// FIX BACK BUTTON STUCK
+// =========================
+window.addEventListener("pageshow", function () {
+
+    hideLoading();
+
+    document.querySelectorAll(".submit-btn")
+        .forEach(btn => {
+
+            btn.disabled = false;
+
+        });
+
+});
+
+</script>
   <script>
     const step1 = document.getElementById('step1');
     const step2 = document.getElementById('step2');

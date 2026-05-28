@@ -27,6 +27,19 @@
   </aside>
   <!-- Main Content -->
   <main class="main-content">
+      @if(session('success'))
+          <div id="alertBox"
+               class="mb-4 p-4 rounded bg-green-100 text-green-800 border border-green-300">
+              {{ session('success') }}
+          </div>
+      @endif
+
+      @if(session('error'))
+          <div id="alertBox"
+               class="mb-4 p-4 rounded bg-red-100 text-red-800 border border-red-300">
+              {{ session('error') }}
+          </div>
+      @endif
     <header class="header">
       <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -80,8 +93,9 @@
                 @if($payment->status === 'pending')
                   <form action="{{ route('admin.payments.check', $payment->bakong_md5) }}" method="POST">
                     @csrf
-                    <button class="action-btn approve">
-                      <i class="fas fa-sync"></i> Check
+                    <button type="submit" class="action-btn approve submit-btn">
+                        <i class="fas fa-sync"></i>
+                        <span class="btn-text">Check</span>
                     </button>
                   </form>
                 @endif
@@ -105,6 +119,71 @@
     </section>
   </main>
 </div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
 
+    <div class="bg-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3">
+        <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
+        <span class="text-lg font-semibold">
+            Processing Payment...
+        </span>
+    </div>
+
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Auto hide alert
+    const alertBox = document.getElementById("alertBox");
+
+    if (alertBox) {
+        setTimeout(() => {
+            alertBox.style.transition = "0.5s";
+            alertBox.style.opacity = "0";
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 500);
+
+        }, 3000);
+    }
+
+    // Handle form submit loading
+    const forms = document.querySelectorAll("form");
+
+    forms.forEach(form => {
+
+        form.addEventListener("submit", function () {
+
+            // Show loading overlay
+            const overlay = document.getElementById("loadingOverlay");
+
+            overlay.classList.remove("hidden");
+            overlay.classList.add("flex");
+
+            // Disable buttons
+            const buttons = form.querySelectorAll("button");
+
+            buttons.forEach(btn => {
+
+                btn.disabled = true;
+
+                const text = btn.querySelector(".btn-text");
+
+                if (text) {
+                    text.innerText = "Checking...";
+                }
+
+                btn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            });
+
+        });
+
+    });
+
+});
+</script>
 </body>
 </html>

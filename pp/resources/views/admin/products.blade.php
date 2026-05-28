@@ -26,13 +26,33 @@
 
     <!-- Main Content -->
     <main class="main-content w-full p-6">
+        @if(session('success'))
+            <div id="alertBox"
+                 class="mb-4 p-4 rounded bg-green-100 text-green-800 border border-green-300">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div id="alertBox"
+                 class="mb-4 p-4 rounded bg-red-100 text-red-800 border border-red-300">
+                {{ session('error') }}
+            </div>
+        @endif
         <h1 class="text-2xl font-bold mb-6">Products</h1>
 
         <!-- Filter -->
         <form method="GET" class="flex flex-wrap gap-4 mb-6">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search Name or Email"
                    class="border rounded px-4 py-2">
-            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Filter</button>
+           <button type="submit"
+                   class="bg-blue-600 text-white px-4 py-2 rounded submit-btn">
+
+               <span class="btn-text">
+                   Filter
+               </span>
+
+           </button>
         </form>
 
         <!-- Totals -->
@@ -95,6 +115,84 @@
 </div>
     </main>
 </div>
+<!-- Loading Overlay -->
+<div id="loadingOverlay"
+     class="fixed inset-0 bg-black bg-opacity-40 hidden items-center justify-center z-50">
 
+    <div class="bg-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3">
+
+        <i class="fas fa-spinner fa-spin text-blue-500 text-2xl"></i>
+
+        <span class="text-lg font-semibold">
+            Loading Products...
+        </span>
+
+    </div>
+
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // =========================
+    // AUTO HIDE ALERT
+    // =========================
+    const alertBox = document.getElementById("alertBox");
+
+    if (alertBox) {
+
+        setTimeout(() => {
+
+            alertBox.style.transition = "0.5s";
+            alertBox.style.opacity = "0";
+
+            setTimeout(() => {
+                alertBox.remove();
+            }, 500);
+
+        }, 3000);
+    }
+
+    // =========================
+    // FORM SUBMIT LOADING
+    // =========================
+    const forms = document.querySelectorAll("form");
+
+    forms.forEach(form => {
+
+        form.addEventListener("submit", function () {
+
+            // show overlay
+            const overlay =
+                document.getElementById("loadingOverlay");
+
+            overlay.classList.remove("hidden");
+            overlay.classList.add("flex");
+
+            // disable all buttons
+            const buttons =
+                form.querySelectorAll("button");
+
+            buttons.forEach(btn => {
+
+                btn.disabled = true;
+
+                const btnText =
+                    btn.querySelector(".btn-text");
+
+                if (btnText) {
+                    btnText.innerText = "Loading...";
+                }
+
+                btn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Loading...';
+
+            });
+
+        });
+
+    });
+
+});
+</script>
 </body>
 </html>
